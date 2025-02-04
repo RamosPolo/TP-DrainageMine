@@ -1,20 +1,16 @@
-import { TupleSpace } from "./TupleSpace.js";
-import { Tuple } from "./Tuple.js"
-import { Template } from "./Template.js";
-
+import {TupleSpace} from "./TupleSpace";
+import {Tuple} from "./Tuple";
+import {Template} from "./Template"
 
 // Création de l'espace de tuples
 const ts = new TupleSpace();
 
 // Exemple de tuple
 const tuple = new Tuple([1, "Hello", 3.14]);
-const tuple2 = new Tuple(["tuple2","hello"])
 ts.out(tuple);
-ts.out(tuple2);
 
 // Exemple de template
 const template = new Template(["number", "string", "number"]);
-const template2 = new Template(["string", "string"]);
 
 // Utilisation de in() (bloquant)
 (async () => {
@@ -30,13 +26,13 @@ const activeTuple = new Tuple([
 ts.eval(activeTuple);
 
 // Utilisation de inp() (non bloquant)
-const nonBlockingTuple = ts.inp(template2);
+const nonBlockingTuple = ts.inp(template);
 if (nonBlockingTuple) {
     console.log("Tuple récupéré (non bloquant):", nonBlockingTuple.toString());
 }
 
 // Utilisation de rdp() (non bloquant)
-const readTuple = ts.rdp(template2);
+const readTuple = ts.rdp(template);
 if (readTuple) {
     console.log("Tuple lu (non bloquant):", readTuple.toString());
 }
