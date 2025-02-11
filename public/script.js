@@ -2,7 +2,6 @@ import { TupleSpace } from "./TupleSpace.js";
 import { Tuple } from "./Tuple.js"
 import { Template } from "./Template.js";
 
-
 // Création de l'espace de tuples
 const ts = new TupleSpace();
 
