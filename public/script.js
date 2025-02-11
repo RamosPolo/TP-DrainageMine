@@ -1,13 +1,13 @@
-import { TupleSpace } from "./TupleSpace";
-import { Tuple } from "./Tuple";
-import { Template } from "./Template";
+import { TupleSpace } from "./TupleSpace.js";
+import { Tuple } from "./Tuple.js"
+import { Template } from "./Template.js";
 
 // Création de l'espace de tuples
 const ts = new TupleSpace();
 
 // Exemple de tuple
 const tuple = new Tuple([1, "Hello", 3.14]);
-const tuple2 = new Tuple(["tuple2", "hello"]);
+const tuple2 = new Tuple(["tuple2","hello"])
 ts.out(tuple);
 ts.out(tuple2);
 
@@ -23,7 +23,7 @@ const template2 = new Template(["string", "string"]);
 
 // Utilisation de eval() pour un tuple actif
 const activeTuple = new Tuple([
-    () => new Promise<string>((resolve) => setTimeout(() => resolve("Evaluated"), 1000)),
+    () => new Promise((resolve) => setTimeout(() => resolve("Evaluated"), 1000)),
     "Passive Value",
 ]);
 ts.eval(activeTuple);

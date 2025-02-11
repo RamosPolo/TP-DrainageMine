@@ -1,13 +1,9 @@
-import {Tuple} from "./Tuple";
-
 export class Template {
-    private types: string[]; // Les types sont représentés par des chaînes (ex: "number", "string")
-
-    constructor(types: string[]) {
+    constructor(types) {
         this.types = types;
     }
 
-    matches(tuple: Tuple): boolean {
+    matches(tuple) {
         if (tuple.getValues().length !== this.types.length) {
             return false;
         }
@@ -19,7 +15,7 @@ export class Template {
         return true;
     }
 
-    toString(): string {
+    toString() {
         return `Template${JSON.stringify(this.types)}`;
     }
 }
