@@ -1,19 +1,23 @@
-import { Tuple } from './Tuple.js';
+import {Tuple} from "./Tuple";
+import {Template} from "./Template";
+
+type Waiter = () => void;
 
 export class TupleSpace {
+    private tuples: Tuple[];
+    private waitingQueue: Waiter[];
+
     constructor() {
         this.tuples = [];
         this.waitingQueue = [];
     }
 
-    // Ajoute un tuple à l'espace de tuples
-    out(tuple) {
+    out(tuple: Tuple): void {
         this.tuples.push(tuple);
         this._notifyWaiters();
     }
 
-    // Récupère et retire un tuple qui correspond au template (bloquant)
-    async in(template) {
+    async in(template: Template): Promise<Tuple> {
         return new Promise((resolve) => {
             const checkForTuple = () => {
                 for (let i = 0; i < this.tuples.length; i++) {
@@ -23,15 +27,13 @@ export class TupleSpace {
                         return;
                     }
                 }
-                // Si aucun tuple ne correspond, on attend
                 this.waitingQueue.push(checkForTuple);
             };
             checkForTuple();
         });
     }
 
-    // Récupère un tuple qui correspond au template sans le retirer (bloquant)
-    async rd(template) {
+    async rd(template: Template): Promise<Tuple> {
         return new Promise((resolve) => {
             const checkForTuple = () => {
                 for (const tuple of this.tuples) {
@@ -40,15 +42,13 @@ export class TupleSpace {
                         return;
                     }
                 }
-                // Si aucun tuple ne correspond, on attend
                 this.waitingQueue.push(checkForTuple);
             };
             checkForTuple();
         });
     }
 
-    // Récupère et retire un tuple qui correspond au template (non bloquant)
-    inp(template) {
+    inp(template: Template): Tuple | null {
         for (let i = 0; i < this.tuples.length; i++) {
             if (template.matches(this.tuples[i])) {
                 return this.tuples.splice(i, 1)[0];
@@ -57,8 +57,7 @@ export class TupleSpace {
         return null;
     }
 
-    // Récupère un tuple qui correspond au template sans le retirer (non bloquant)
-    rdp(template) {
+    rdp(template: Template): Tuple | null {
         for (const tuple of this.tuples) {
             if (template.matches(tuple)) {
                 return tuple;
@@ -67,8 +66,7 @@ export class TupleSpace {
         return null;
     }
 
-    // Crée un tuple actif et l'évalue de manière concurrente
-    eval(activeTuple) {
+    eval(activeTuple: Tuple): void {
         const evaluateFields = async () => {
             const evaluatedValues = await Promise.all(
                 activeTuple.getValues().map(async (value) => {
@@ -84,11 +82,12 @@ export class TupleSpace {
         evaluateFields();
     }
 
-    // Notifie les agents en attente
-    _notifyWaiters() {
+    private _notifyWaiters(): void {
         while (this.waitingQueue.length > 0 && this.tuples.length > 0) {
             const waiter = this.waitingQueue.shift();
-            waiter();
+            if (waiter) {
+                waiter();
+            }
         }
     }
 }
