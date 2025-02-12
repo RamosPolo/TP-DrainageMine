@@ -1,21 +1,17 @@
 export class Template {
-    constructor(types) {
-        this.types = types;
+    constructor(pattern) {
+        this.pattern = pattern;
     }
 
     matches(tuple) {
-        if (tuple.getValues().length !== this.types.length) {
+        const values = tuple.getValues();
+
+        // Vérifier qu'il y a bien au moins un élément dans le tuple
+        if (values.length === 0) {
             return false;
         }
-        for (let i = 0; i < this.types.length; i++) {
-            if (typeof tuple.getValues()[i] !== this.types[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    toString() {
-        return `Template${JSON.stringify(this.types)}`;
+        // Comparer seulement le premier élément (le "titre")
+        return this.pattern[0] === values[0];
     }
 }
