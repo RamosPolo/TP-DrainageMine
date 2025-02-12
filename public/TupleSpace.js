@@ -47,6 +47,48 @@ export class TupleSpace {
         });
     }
 
+    add(template, newValue) {
+        for (let tuple of this.tuples) {
+            if (template.matches(tuple)) {
+                const values = tuple.getValues();
+    
+                // Vérifier qu'il y a au moins 2 éléments (titre + valeur)
+                if (values.length > 1) {
+                    values[1] = newValue; // Modification de la valeur
+                }
+    
+                return true; // Modification réussie
+            }
+        }
+        return false; // Aucun tuple correspondant trouvé
+    }
+
+    addp(template, newValue) {
+        return new Promise((resolve) => {
+            const modifyTuple = () => {
+                for (let tuple of this.tuples) {
+                    if (template.matches(tuple)) {
+                        const values = tuple.getValues();
+    
+                        // Vérifier qu'il y a au moins 2 éléments (titre + valeur)
+                        if (values.length > 1) {
+                            values[1] = newValue; // Modification de la valeur
+                        }
+    
+                        resolve(true); // Modification réussie
+                        return;
+                    }
+                }
+    
+                // Si aucun tuple ne correspond, on attend
+                this.waitingQueue.push(modifyTuple);
+            };
+    
+            modifyTuple();
+        });
+    }
+    
+
     // Récupère et retire un tuple qui correspond au template (non bloquant)
     inp(template) {
         for (let i = 0; i < this.tuples.length; i++) {
