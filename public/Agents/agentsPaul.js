@@ -43,3 +43,19 @@ export async function Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO){
         ts.out(new Tuple(["detection_gaz_bas"]));
     }
 }
+
+export async function Gaz_bas(ts, seuil_CH4, seuil_CO){
+
+    // detection de gaz bas
+    const templateDetectionGazBas = new Template(["detection_gaz_bas"]);
+    const detectGazBas = await ts.rd(templateDetectionGazBas);
+
+    // valeurs du niveau
+    let templateNiveauCH4 = new Template(["niveau_CH4"]);
+    const y = await ts.rd(templateNiveauCH4);
+
+    let templateNiveauCO = new Template(["niveau_CO"]);
+    const z = await ts.rd(templateNiveauCO);
+
+    // TODO : Finir l'agent Baz Bas
+}
