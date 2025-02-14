@@ -16,6 +16,21 @@ export function ventilateurAgent(ts, etat) {
 }
 
 
-export async function H20_haut(){
+// Détection du franchissment à la hausse du niveau d'eau
+export async function H2O_haut(ts, seuil_H20_haut){
 
+    const templateDectectionH20Haut = new Template(["detection_H2O_haut"]);
+    const templateNiveauH2O = new Template(["niveau_H2O"]);
+
+    await ts.rd(templateDectectionH20Haut)
+
+    const x = await ts.rd(templateNiveauH2O)
+
+    if( x.values[1] >= seuil_H20_haut){
+       ts.out(new Tuple(["H2O_haut_detecte"]))
+       await ts.in(templateDectectionH20Haut)
+       console.log("H2O élevé")
+    } else {
+        console.log("H2O correct", x.values[1])
+    }
 }

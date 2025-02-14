@@ -30,6 +30,10 @@ export class TupleSpace {
         });
     }
 
+    async printTuples(){
+        console.log(this.tuples)
+    }
+
     // Récupère un tuple qui correspond au template sans le retirer (bloquant)
     async rd(template) {
         return new Promise((resolve) => {

@@ -23,7 +23,7 @@ export async function Pompe(ts) {
 }
 
 export async function Commande_Pompe(ts, seuil_CH4, seuil_CO){
-    let tempH20_haut_detecte = new Template(["H20_haut_detecte"]);
+    let tempH20_haut_detecte = new Template(["H2O_haut_detecte"]);
     const H20_haut_detecte = await ts.in(tempH20_haut_detecte);     // valeur detection eau haut
 
     let tempNiveau_CH4 = new Template(["niveau_CH4"]);
@@ -34,7 +34,7 @@ export async function Commande_Pompe(ts, seuil_CH4, seuil_CO){
 
     if(y.values[1] < seuil_CH4 && z.values[1] < seuil_CO){
         ts.out(new Tuple(["activation_pompe"]));
-        ts.out(new Tuple(["detection_H20_bas"]));
+        ts.out(new Tuple(["detection_H2O_bas"]));
         ts.out(new Tuple(["detection_gaz_haut"]));
     }
     if(y.values[1] >= seuil_CH4 || z.values[1] >= seuil_CO){

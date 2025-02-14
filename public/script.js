@@ -1,8 +1,8 @@
 import { TupleSpace } from "./TupleSpace.js";
 import { Tuple } from "./Tuple.js";
 import { Template } from "./Template.js";
-import {  } from "./Agents/agentsLeo.js"
-import {  } from "./Agents/agentsPaul.js"
+import { H2O_haut } from "./Agents/agentsLeo.js"
+import { Commande_Pompe } from "./Agents/agentsPaul.js"
 
 
 // Création de l'espace de tuples
@@ -12,11 +12,13 @@ const ts = new TupleSpace();
 ts.out(new Tuple(["pompe-activation", "on"]));
 ts.out(new Tuple(["ventillateur-activation", "off"]));
 ts.out(new Tuple(["temperature", 22.5]));
-ts.out(new Tuple(["niveau-eau", 75.3]));
-ts.out(new Tuple(["niveau-gaz", 40.2]));
+ts.out(new Tuple(["niveau_H2O", 75.3]));
+ts.out(new Tuple(["niveau-gaz", 40.2])); //TODO : a changer de nom
+ts.out(new Tuple(["H2O_haut_detecte", false]));
+ts.out(new Tuple(["detection_H2O_haut", false]));
 
 // Templates pour les niveaux d'eau et de gaz
-const templateEau = new Template(["niveau-eau"]);
+const templateEau = new Template(["niveau_H2O"]);
 const templateGaz = new Template(["niveau-gaz"]);
 
 /**
@@ -43,13 +45,16 @@ async function readNiveauAgent(){
     console.log("Tuple après plusieurs modifications:")
     console.log("  - Niveau Eau:", readEau ? readEau.toString() : "Non trouvé")
     console.log("  - Niveau Gaz:", readGaz ? readGaz.toString() : "Non trouvé")
+
+    await H2O_haut(ts,30)
+    await Commande_Pompe(ts, 40, 30)
 }
 
 // Mettre les fonctions agents ici
 async function activeAgents(){
 
     await Promise.all([
-        readNiveauAgent()
+        await readNiveauAgent()
     ]);
     
 }
