@@ -3,8 +3,8 @@ import { Tuple } from "../Tuple.js";
 import { Template } from "../Template.js";
 
 export function ventilateurAgent(ts, etat) {
-    const templateActivationVentilateur = new Template(["activation-ventilateur"]);
-    const templateDesactivationVentilateur = new Template(["désactivation-ventilateur"]);
+    const templateActivationVentilateur = new Template(["activation_ventilateur"]);
+    const templateDesactivationVentilateur = new Template(["desactivation_ventilateur"]);
     const actVentTuple = ts.inp(templateActivationVentilateur);
     if(actVentTuple){
         console.log("ventilateur actif")

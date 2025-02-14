@@ -22,7 +22,7 @@ export async function Pompe(ts) {
     }
 }
 
-export async function Commande_Pompe(ts, seuil_CH4, seuil_CO){
+export async function Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO){
     let tempH20_haut_detecte = new Template(["H2O_haut_detecte"]);
     const H20_haut_detecte = await ts.in(tempH20_haut_detecte);     // valeur detection eau haut
 
