@@ -1,7 +1,7 @@
 import { TupleSpace } from "./TupleSpace.js";
 import { Tuple } from "./Tuple.js";
 import { Template } from "./Template.js";
-import { H2O_haut } from "./Agents/agentsLeo.js"
+import { H2O_haut, Surveillance_gaz_haut } from "./Agents/agentsLeo.js"
 import { Commande_Pompe_Ventilateur, Pompe } from "./Agents/agentsPaul.js"
 
 
@@ -9,7 +9,7 @@ import { Commande_Pompe_Ventilateur, Pompe } from "./Agents/agentsPaul.js"
 const ts = new TupleSpace();
 
 // seuils de detections
-const seuil_H2O = 90.0;
+const seuil_H2O = 40.0;
 const seuil_CH4 = 89.0;
 const seuil_CO = 88.6;
 
@@ -77,22 +77,23 @@ async function readNiveauAgent(){
 let h2oAgentActive = false;
 let pompeAgentActive = false;
 let ventilateurAgentActive = false;
+let surveillanceGazHautActive = false;
 
 async function activeAgents() {
     console.log(h2oAgentActive, pompeAgentActive, ventilateurAgentActive);
 
     // Vérifie si l'agent H2O_haut est déjà en cours d'exécution, sinon l'active
     if (!h2oAgentActive) {
-        console.log("Activation de l'agent H2O_haut", h2oAgentActive);
+        console.log("l'agent H2O_haut lancé")
         h2oAgentActive = true;
-        H2O_haut(ts, 30).finally(() => {
+        H2O_haut(ts, seuil_H2O).finally(() => {
             h2oAgentActive = false; // L'agent est terminé, on réinitialise l'état
         });
     }
 
     // Vérifie si l'agent Commande_Pompe_Ventilateur est déjà en cours d'exécution, sinon l'active
     if (!pompeAgentActive) {
-        console.log("Activation de l'agent Commande_Pompe_Ventilateur");
+        console.log("l'agent Commande_Pompe_Ventilateur lancé")
         pompeAgentActive = true;
         Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO).finally(() => {
             pompeAgentActive = false; // L'agent est terminé, on réinitialise l'état
@@ -101,10 +102,18 @@ async function activeAgents() {
 
     // Vérifie si l'agent Pompe est déjà en cours d'exécution, sinon l'active
     if (!ventilateurAgentActive) {
-        console.log("Activation de l'agent Pompe");
+        console.log("l'agent Pompe est lancé")
         ventilateurAgentActive = true;
         Pompe(ts).finally(() => {
             ventilateurAgentActive = false; // L'agent est terminé, on réinitialise l'état
+        });
+    }
+
+    if (!surveillanceGazHautActive) {
+        console.log("l'agent Surveillance gaz haut est lancé")
+        surveillanceGazHautActive = true;
+        Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO).finally(() => {
+            surveillanceGazHautActive = false; // L'agent est terminé, on réinitialise l'état
         });
     }
     
