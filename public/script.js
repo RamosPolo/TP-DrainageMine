@@ -17,6 +17,8 @@ const seuil_CO = 88.6;
 ts.out(new Tuple(["niveau_H2O", 20.3]));
 ts.out(new Tuple(["niveau_CH4", 10.1]));
 ts.out(new Tuple(["niveau_CO", 13.6]));
+ts.out(new Tuple(["detection_H2O_haut"]));
+
 
 // Templates pour les niveaux d'eau et de gaz
 const templateEau = new Template(["niveau_H2O"]);
@@ -72,23 +74,51 @@ async function readNiveauAgent(){
     console.log("  - Niveau Gaz CO:", readGazCO ? readGazCO.toString() : "Non trouvé");
 }
 
-// Mettre les fonctions agents ici
-async function activeAgents(){
+let h2oAgentActive = false;
+let pompeAgentActive = false;
+let ventilateurAgentActive = false;
 
-    await Promise.all([
-        H2O_haut(ts,seuil_H2O),
-        Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO),
-        Pompe(ts)
-    ]);
+async function activeAgents() {
+    console.log(h2oAgentActive, pompeAgentActive, ventilateurAgentActive);
+
+    // Vérifie si l'agent H2O_haut est déjà en cours d'exécution, sinon l'active
+    if (!h2oAgentActive) {
+        console.log("Activation de l'agent H2O_haut", h2oAgentActive);
+        h2oAgentActive = true;
+        H2O_haut(ts, 30).finally(() => {
+            h2oAgentActive = false; // L'agent est terminé, on réinitialise l'état
+        });
+    }
+
+    // Vérifie si l'agent Commande_Pompe_Ventilateur est déjà en cours d'exécution, sinon l'active
+    if (!pompeAgentActive) {
+        console.log("Activation de l'agent Commande_Pompe_Ventilateur");
+        pompeAgentActive = true;
+        Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO).finally(() => {
+            pompeAgentActive = false; // L'agent est terminé, on réinitialise l'état
+        });
+    }
+
+    // Vérifie si l'agent Pompe est déjà en cours d'exécution, sinon l'active
+    if (!ventilateurAgentActive) {
+        console.log("Activation de l'agent Pompe");
+        ventilateurAgentActive = true;
+        Pompe(ts).finally(() => {
+            ventilateurAgentActive = false; // L'agent est terminé, on réinitialise l'état
+        });
+    }
     
 }
 
-// 🔵 Démarre l'intervalle de modification des niveaux toutes les 2 secondes
+// Démarre l'intervalle de modification des niveaux toutes les 2 secondes
 setInterval(modifyLevels, 2000);
 
-// 🔵 Vérification après 0.5 secondes pour voir si les tuples ont bien été modifiés
-setInterval(activeAgents, 500);
+// Vérification après 0.5 secondes pour voir si les tuples ont bien été modifiés
+setInterval(activeAgents, 1000);
 
+// Lecture des niveaux après 1.999 secondes
 setInterval(readNiveauAgent, 1999);
+
+
 
 
