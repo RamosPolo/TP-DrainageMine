@@ -2,16 +2,19 @@ import { TupleSpace } from "../TupleSpace.js";
 import { Tuple } from "../Tuple.js";
 import { Template } from "../Template.js";
 
-export function ventilateurAgent(ts, etat) {
+export async function ventilateurAgent(ts) {
     const templateActivationVentilateur = new Template(["activation_ventilateur"]);
     const templateDesactivationVentilateur = new Template(["desactivation_ventilateur"]);
-    const actVentTuple = ts.inp(templateActivationVentilateur);
-    if(actVentTuple){
-        console.log("ventilateur actif")
+    const actVentTuple = await ts.inp(templateActivationVentilateur);
+    const desVentTuple = await ts.inp(templateDesactivationVentilateur);
+
+    if(actVentTuple != null){
+        console.log("Agent_Ventilateur : Activation de la pompe");
+        return "on";
     }
-    const desVentTuple = ts.inp(templateDesactivationVentilateur);
-    if(desVentTuple){
-        console.log("ventilateur non_actif")
+    if(desVentTuple != null){
+        console.log("Agent_Ventilateur : désactivation du ventilateur");
+        return "off";
     }
 }
 
@@ -20,17 +23,19 @@ export async function H2O_haut(ts, seuil_H20_haut) {
     const templateDectectionH20Haut = new Template(["detection_H2O_haut"]);
     const templateNiveauH2O = new Template(["niveau_H2O"]);
 
-    await ts.rd(templateDectectionH20Haut);
+    const dectectionH20HautTupleawait = await ts.rdp(templateDectectionH20Haut);
 
     const x = await ts.rd(templateNiveauH2O);
 
-    if (x.values[1] >= seuil_H20_haut) {
-        ts.out(new Tuple(["H2O_haut_detecte"]));
-        console.log("ajouter !!!")
-        ts.in(new Template(["detection_H2O_haut"]));
-        console.log("H2O élevé");
-    } else {
-        console.log("H2O correct", x.values[1]);
+    if(dectectionH20HautTupleawait != null){
+        if (x.values[1] >= seuil_H20_haut) {
+            console.log("va ajouter ") 
+            ts.out(new Tuple(["H2O_haut_detecte"])); // beug ici
+            ts.in(new Template(["detection_H2O_haut"]));
+            console.log("H2O élevé");
+        } else {
+            console.log("H2O correct", x.values[1]);
+        }
     }
 }
 
@@ -51,7 +56,9 @@ export async function Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO) {
             console.log("Ok : Les deux gaz sont en dessous des seuils");
         } else {
             console.log("Au moins un des deux gaz est au-dessus des seuils");
+            ts.printTuples()
             ts.out(new Tuple(["activation_ventilateur"]));
+            console.log("ajout du tuple activation vent");
             await ts.in(new Template(["detection_gaz_haut"]));
         }
     }
@@ -62,21 +69,19 @@ export async function Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO) {
 export async function H2O_bas(ts, seuil_H2O_bas) {
     const templateDectectionH2OBas = new Template(["detection_H2O_bas"]);
     const templateNiveauH2O = new Template(["niveau_H2O"]);
-
+    
     const detectionH20BasTuple = await ts.rdp(templateDectectionH2OBas);
-
+    console.log("salut", detectionH20BasTuple)
     const x = await ts.rd(templateNiveauH2O);
 
-    if(detectionH20BasTuple){
+    if(detectionH20BasTuple != null){
         if (x.values[1] >= seuil_H2O_bas) {
             console.log("Continuer d'utiliser la pompe");
         } else {
-            console.log("RENTRE")
+            console.log("H20 bas problème")
             ts.out(new Tuple(["desactivation_pompe"])); // beug par la
             ts.out(new Tuple(["desactivation_ventilateur"]));
-            console.log("RENTRE 2")
             await ts.in(new Template(["detection_H2O_bas"]));
-            console.log("RENTRE 3")
             ts.out(new Tuple(["detection_H2O_haut"]));
             console.log("Arreter d'uliser d'utiliser la pompe");
         }
