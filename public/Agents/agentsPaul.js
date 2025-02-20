@@ -4,27 +4,29 @@ import {Tuple} from "../Tuple.js";
 let etatPompe = "off";
 
 export async function Pompe(ts) {
-    // Templates pour les valeurs de la pompe
     let tempActivPompe = new Template(["activation_pompe"]);
     let tempDesactivPompe = new Template(["desactivation_pompe"]);
-    // tuples récupérés ou pas
-    let valActive = ts.inp(tempActivPompe);
-    let valDesac = ts.inp(tempDesactivPompe);
 
-    // activation ou desactivation de la pompe
-    if(valActive != null){
+    let valActive = await ts.inp(tempActivPompe);
+    let valDesac = await ts.inp(tempDesactivPompe);
+
+    if (valActive != null) {
         console.log("Agent_Pompe : Activation de la pompe");
-        etatPompe = "on"
+        return "on";
     }
-    if(valDesac != null){
-        console.log("Agent_Pompe : Desactivation de la pompe");
-        etatPompe = "off"
+    if (valDesac != null) {
+        console.log("Agent_Pompe : Désactivation de la pompe");
+        return "off"; 
     }
 }
 
+
 export async function Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO){
     let tempH20_haut_detecte = new Template(["H2O_haut_detecte"]);
+    console.log("rentre")
+
     const H20_haut_detecte = await ts.in(tempH20_haut_detecte);     // valeur detection eau haut
+    console.log("apres", H20_haut_detecte)
 
     let tempNiveau_CH4 = new Template(["niveau_CH4"]);
     const y = await ts.rd(tempNiveau_CH4);      // valeur du niveau de gaz CH4
@@ -34,6 +36,7 @@ export async function Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO){
 
     if(y.values[1] < seuil_CH4 && z.values[1] < seuil_CO){
         ts.out(new Tuple(["activation_pompe"]));
+        console.log("ACTIVE LA POMPE")
         ts.out(new Tuple(["detection_H2O_bas"]));
         ts.out(new Tuple(["detection_gaz_haut"]));
     }

@@ -26,7 +26,8 @@ export async function H2O_haut(ts, seuil_H20_haut) {
 
     if (x.values[1] >= seuil_H20_haut) {
         ts.out(new Tuple(["H2O_haut_detecte"]));
-        // await ts.in(new Template(["detection_H2O_haut"])); // recherche infini attendre la creation de l'agent H2O_bas
+        console.log("ajouter !!!")
+        ts.in(new Template(["detection_H2O_haut"])); // recherche infini attendre la creation de l'agent H2O_bas
         console.log("H2O élevé");
     } else {
         console.log("H2O correct", x.values[1]);
@@ -34,26 +35,51 @@ export async function H2O_haut(ts, seuil_H20_haut) {
 }
 
 
-
 // Détection du franchissment à la hausse du niveau pour au moins un des deux gaz
-export async function Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO){
-
+export async function Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO) {
     const templateDectectionGazHaut = new Template(["detection_gaz_haut"]);
     const templateNiveauCH4 = new Template(["niveau_CH4"]);
     const templateNiveauCO = new Template(["niveau_CO"]);
 
-    await ts.rd(templateDectectionGazHaut)
-    const y = await ts.rd(templateNiveauCH4)
-    const z = await ts.rd(templateNiveauCO)
+    const detectionGazHautTuple = await ts.rdp(templateDectectionGazHaut);
 
-    if( y.values[1] < seuil_CH4 && z < seuil_CO){
-       console.log("Ok : Les deux gaz sont en dessous des seuils")
-    } else {
-        console.log("Au moins un des deux gaz est au dessus des seuils")
-        ts.out(new Tuple(["activation_ventilateur"]));
-        await ts.in(new Template(["detection_gaz_haut"]))
+    // Récupère les niveaux de gaz 
+    const y = await ts.rd(templateNiveauCH4);
+    const z = await ts.rd(templateNiveauCO);
+
+    if(detectionGazHautTuple){
+        if (y.values[1] < seuil_CH4 && z.values[1] < seuil_CO) {
+            console.log("Ok : Les deux gaz sont en dessous des seuils");
+        } else {
+            console.log("Au moins un des deux gaz est au-dessus des seuils");
+            ts.out(new Tuple(["activation_ventilateur"]));
+            await ts.in(new Template(["detection_gaz_haut"]));
+        }
     }
 }
 
 
+// Détection du niveau d'eau bas lorsque la pompe fonctionne
+export async function H2O_bas(ts, seuil_H2O_bas) {
+    const templateDectectionH2OBas = new Template(["detection_H2O_bas"]);
+    const templateNiveauH2O = new Template(["niveau_H2O"]);
 
+    const detectionH20BasTuple = await ts.rdp(templateDectectionH2OBas);
+
+    const x = await ts.rd(templateNiveauH2O);
+
+    if(detectionH20BasTuple){
+        if (x.values[1] >= seuil_H2O_bas) {
+            console.log("Continuer d'utiliser la pompe");
+        } else {
+            console.log("RENTRE")
+            ts.out(new Tuple(["desactivation_pompe"])); // beug par la
+            ts.out(new Tuple(["desactivation_ventilateur"]));
+            console.log("RENTRE 2")
+            await ts.in(new Template(["detection_H2O_bas"]));
+            console.log("RENTRE 3")
+            ts.out(new Tuple(["detection_H2O_haut"]));
+            console.log("Arreter d'uliser d'utiliser la pompe");
+        }
+    }
+}
