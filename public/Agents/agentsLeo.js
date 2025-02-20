@@ -27,7 +27,7 @@ export async function H2O_haut(ts, seuil_H20_haut) {
     if (x.values[1] >= seuil_H20_haut) {
         ts.out(new Tuple(["H2O_haut_detecte"]));
         console.log("ajouter !!!")
-        ts.in(new Template(["detection_H2O_haut"])); // recherche infini attendre la creation de l'agent H2O_bas
+        ts.in(new Template(["detection_H2O_haut"]));
         console.log("H2O élevé");
     } else {
         console.log("H2O correct", x.values[1]);
@@ -40,7 +40,6 @@ export async function Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO) {
     const templateDectectionGazHaut = new Template(["detection_gaz_haut"]);
     const templateNiveauCH4 = new Template(["niveau_CH4"]);
     const templateNiveauCO = new Template(["niveau_CO"]);
-
     const detectionGazHautTuple = await ts.rdp(templateDectectionGazHaut);
 
     // Récupère les niveaux de gaz 

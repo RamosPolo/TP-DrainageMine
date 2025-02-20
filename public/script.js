@@ -9,9 +9,9 @@ import { Commande_Pompe_Ventilateur, Pompe } from "./Agents/agentsPaul.js"
 const ts = new TupleSpace();
 
 // seuils de detections
-const seuil_H2O = 40.0;
-const seuil_CH4 = 89.0;
-const seuil_CO = 88.6;
+const seuil_H2O = 50;
+const seuil_CH4 = 50;
+const seuil_CO = 50;
 const seuil_H2O_bas = 10;
 
 
@@ -38,7 +38,7 @@ const templateVentilateurActive = new Template(["activation_ventilateur"]);
  */
 async function modifyLevels() {
     // Récupération des valeurs
-    const tupleH20 = await  ts.rd(templateEau);
+    const tupleH20 = await ts.rd(templateEau);
     const tupleCH4 = await ts.rd(templateCH4);
     const tupleCO = await ts.rd(templateCO);
 
@@ -52,14 +52,14 @@ async function modifyLevels() {
     let newGazCO = tupleCO.values[1] + 4.6;
 
     // si la pompe est activé
-    if(etat_pompe_Global == "on"){
+    if (etat_pompe_Global == "on") {
         console.log("DIMINUE")
         newEau = tupleH20.values[1] - 8.3;
     }
     // si le ventilateur est activé
-    if(ventilateur_Active != null && (newGazCH4 >= 5.0 || newGazCO > 5.0)){
+    if (ventilateur_Active != null && (newGazCH4 >= 5.0 || newGazCO > 5.0)) {
         newGazCH4 = tupleCH4.values[1] - 10.3;
-        newGazCO = tupleCO.values[1] -12.6;
+        newGazCO = tupleCO.values[1] - 12.6;
     }
 
     // Modifie les niveaux en parallèle
@@ -70,7 +70,7 @@ async function modifyLevels() {
     ]);
 }
 
-async function readNiveauAgent(){
+async function readNiveauAgent() {
     let readEau = ts.rdp(templateEau);
     let readGaz = ts.rdp(templateCH4);
     let readGazCO = ts.rdp(templateCO);
@@ -91,14 +91,17 @@ async function activeAgents() {
     // Vérifie si l'agent H2O_haut est déjà en cours d'exécution, sinon l'active
     if (!h2oAgentActive) {
         console.log("l'agent H2O_haut lancé")
+        console.log("l'agent H2O_haut lancé")
         h2oAgentActive = true;
         H2O_haut(ts, seuil_H2O).finally(() => {
             h2oAgentActive = false; // L'agent est terminé, on réinitialise l'état
         });
     }
 
+
     // Vérifie si l'agent Commande_Pompe_Ventilateur est déjà en cours d'exécution, sinon l'active
     if (!pompeAgentActive) {
+        console.log("l'agent Commande_Pompe_Ventilateur lancé")
         console.log("l'agent Commande_Pompe_Ventilateur lancé")
         pompeAgentActive = true;
         Commande_Pompe_Ventilateur(ts, seuil_CH4, seuil_CO).finally(() => {
@@ -110,34 +113,33 @@ async function activeAgents() {
     if (!ventilateurAgentActive) {
         console.log("L'agent Pompe est lancé");
         ventilateurAgentActive = true;
-    
+
         try {
             let etat = await Pompe(ts);
-            if(etat){
+            if (etat) {
                 etat_pompe_Global = etat
             }
             console.log("État de la pompe :", etat_pompe_Global);
         } finally {
             ventilateurAgentActive = false;
         }
-    }    
+    }
 
     if (!surveillanceGazHautActive) {
         console.log("l'agent Surveillance gaz haut est lancé")
         surveillanceGazHautActive = true;
         Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO).finally(() => {
-            surveillanceGazHautActive = false; 
+            surveillanceGazHautActive = false;
         });
     }
 
-    if (! h2oBasAgentActive){
+    if (!h2oBasAgentActive) {
         console.log("l'agent h2O bas est lancé")
         h2oBasAgentActive = true;
         H2O_bas(ts, seuil_H2O_bas).finally(() => {
             h2oBasAgentActive = false;
-        }); 
+        });
     }
-    
 }
 
 // Démarre l'intervalle de modification des niveaux toutes les 2 secondes
