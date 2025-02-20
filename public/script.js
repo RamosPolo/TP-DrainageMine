@@ -1,7 +1,7 @@
 import { TupleSpace } from "./TupleSpace.js";
 import { Tuple } from "./Tuple.js";
 import { Template } from "./Template.js";
-import { H2O_haut } from "./Agents/agentsLeo.js"
+import { H2O_haut, Surveillance_gaz_haut } from "./Agents/agentsLeo.js"
 import { Commande_Pompe_Ventilateur, Pompe } from "./Agents/agentsPaul.js"
 
 
@@ -77,6 +77,7 @@ async function readNiveauAgent(){
 let h2oAgentActive = false;
 let pompeAgentActive = false;
 let ventilateurAgentActive = false;
+let surveillanceGazHaut = false;
 
 async function activeAgents() {
     console.log(h2oAgentActive, pompeAgentActive, ventilateurAgentActive);
@@ -105,6 +106,14 @@ async function activeAgents() {
         ventilateurAgentActive = true;
         Pompe(ts).finally(() => {
             ventilateurAgentActive = false; // L'agent est terminé, on réinitialise l'état
+        });
+    }
+
+    if (!surveillanceGazHaut) {
+        console.log("Activation de l'agent Surveillance gaz haut");
+        surveillanceGazHaut = true;
+        Surveillance_gaz_haut(ts, seuil_CH4, seuil_CO).finally(() => {
+            surveillanceGazHaut = false; // L'agent est terminé, on réinitialise l'état
         });
     }
     
