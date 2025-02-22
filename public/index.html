@@ -5,9 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Drainage Mine</title>
     <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<h1>Monitoring des Niveaux</h1>
 
+<div class="container">
+    <div class="level">
+        <p>Niveau d'eau</p>
+        <div class="bar-container">
+            <div class="bar" id="water-bar"></div>
+        </div>
+        <p id="water-value">0%</p>
+    </div>
+
+    <div class="level">
+        <p>CH4</p>
+        <div class="bar-container">
+            <div class="bar" id="ch4-bar"></div>
+        </div>
+        <p id="ch4-value">0%</p>
+    </div>
+
+    <div class="level">
+        <p>CO2</p>
+        <div class="bar-container">
+            <div class="bar" id="co2-bar"></div>
+        </div>
+        <p id="co2-value">0%</p>
+    </div>
+
+    <div class="status">
+        <p>Ventilateur : <span id="fan-status">OFF</span></p>
+    </div>
+
+    <div class="status">
+        <p>Pompe : <span id="pump-status">OFF</span></p>
+    </div>
+</div>
 
 </body>
 </html>

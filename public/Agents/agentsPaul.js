@@ -60,5 +60,12 @@ export async function Gaz_bas(ts, seuil_CH4, seuil_CO){
     let templateNiveauCO = new Template(["niveau_CO"]);
     const z = await ts.rd(templateNiveauCO);
 
-    // TODO : Finir l'agent Baz Bas
+    if(y.values[1] < seuil_CH4 && z.values[1] < seuil_CO){
+        ts.out(new Tuple(["activation_pompe"]));
+        ts.out(new Tuple(["detection_H2O_bas"]));
+        await ts.in(new Template(["detection_gaz_bas"]));
+    }
+    if(y.values[1] >= seuil_CH4 || z.values[1] >= seuil_CO){
+        // rien
+    }
 }
