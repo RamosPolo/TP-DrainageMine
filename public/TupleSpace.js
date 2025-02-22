@@ -7,9 +7,9 @@ export class TupleSpace {
     }
 
     // Ajoute un tuple à l'espace de tuples
-    out(tuple) {
+    async out(tuple) {
         this.tuples.push(tuple);
-        this._notifyWaiters();
+        await this._notifyWaiters(); // On attend que les agents soient bien réveillés
     }
 
     // Récupère et retire un tuple qui correspond au template (bloquant)
@@ -133,10 +133,11 @@ export class TupleSpace {
     }
 
     // Notifie les agents en attente
-    _notifyWaiters() {
+    async _notifyWaiters() {
         while (this.waitingQueue.length > 0 && this.tuples.length > 0) {
             const waiter = this.waitingQueue.shift();
-            waiter();
+            setTimeout(() => waiter(), 0); // Exécuter sans bloquer
         }
-    }
+    }    
+    
 }
