@@ -73,7 +73,7 @@ export async function H2O_bas(ts, seuil_H2O_bas) {
     if (x.values[1] >= seuil_H2O_bas) {
         console.log("Continuer d'utiliser la pompe");
     } else {
-        ts.out(new Tuple(["desactivation_pompe"])); // beug par la
+        ts.out(new Tuple(["desactivation_pompe"]));
         ts.out(new Tuple(["desactivation_ventilateur"]));
         await ts.in(new Template(["detection_H2O_bas"]));
         ts.out(new Tuple(["detection_H2O_haut"]));

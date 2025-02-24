@@ -50,7 +50,7 @@ async function modifyLevels() {
         const tupleCO = await ts.rd(templateCO);
 
         let newEau = tupleH20.values[1] + 5.2;
-        let newGazCH4 = tupleCH4.values[1] + 2.4;
+        let newGazCH4 = tupleCH4.values[1] + 4;
         let newGazCO = tupleCO.values[1] + 4.6;
 
         if (etat_pompe_Global === "on") {
@@ -177,8 +177,39 @@ async function activeAgents() {
     console.log("[Système] Tous les agents ont été activés.");
 }
 
+async function updateUI() {
+    try {
+        const tupleH20 = await ts.rd(templateEau);
+        const tupleCH4 = await ts.rd(templateCH4);
+        const tupleCO = await ts.rd(templateCO);
+
+        const niveauEau = tupleH20.values[1];
+        const niveauCH4 = tupleCH4.values[1];
+        const niveauCO = tupleCO.values[1];
+
+        document.getElementById("water-bar").style.width = niveauEau + "%";
+        document.getElementById("ch4-bar").style.width = niveauCH4 + "%";
+        document.getElementById("co2-bar").style.width = niveauCO + "%";
+
+        document.getElementById("water-value").innerText = niveauEau.toFixed(1) + "%";
+        document.getElementById("ch4-value").innerText = niveauCH4.toFixed(1) + "%";
+        document.getElementById("co2-value").innerText = niveauCO.toFixed(1) + "%";
+
+        document.getElementById("pump-status").innerText = etat_pompe_Global.toUpperCase();
+        document.getElementById("pump-status").style.color = etat_pompe_Global === "on" ? "green" : "red";
+
+        document.getElementById("fan-status").innerText = etat_ventilateur_Global.toUpperCase();
+        document.getElementById("fan-status").style.color = etat_ventilateur_Global === "on" ? "green" : "red";
+    } catch (error) {
+        console.error("Erreur dans updateUI :", error);
+    }
+}
+
 
 // Démarrage des intervalles
+setInterval(updateUI, 1000);
 setInterval(modifyLevels, 2000);
 setInterval(activeAgents, 1000);
 setInterval(readNiveauAgent, 1999);
+
+
