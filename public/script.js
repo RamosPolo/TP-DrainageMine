@@ -13,6 +13,16 @@ const seuil_CH4 = 50;
 const seuil_CO = 50;
 const seuil_H2O_bas = 11;
 
+// Augmentation
+window.aug_CH4 = 4;
+window.aug_CO = 3;
+window.aug_H2O = 4.5;
+
+
+// Puissance appareil
+const puiss_pompe = 10.2
+const puiss_vent = 8.3
+
 let etat_pompe_Global = "off";
 let etat_ventilateur_Global = "off";
 
@@ -49,17 +59,34 @@ async function modifyLevels() {
         const tupleCH4 = await ts.rd(templateCH4);
         const tupleCO = await ts.rd(templateCO);
 
-        let newEau = tupleH20.values[1] + 5.2;
-        let newGazCH4 = tupleCH4.values[1] + 4;
-        let newGazCO = tupleCO.values[1] + 4.6;
+        let newGazCH4 = tupleCH4.values[1] + window.aug_CH4;
+        let newGazCO = tupleCO.values[1] + window.aug_CO;
+        let newEau = tupleH20.values[1] + window.aug_H2O;
+
+        if(newGazCH4 > 100){
+            newGazCH4 = 100
+        }
+        if(newGazCO > 100){
+            newGazCO = 100
+        }
+        if(newEau > 100){
+            newEau = 100
+        }
+        
 
         if (etat_pompe_Global === "on") {
-            newEau = tupleH20.values[1] - 8.3;
+            newEau = tupleH20.values[1] - puiss_pompe;
         }
 
         if (etat_ventilateur_Global === "on") {
-            newGazCH4 = tupleCH4.values[1] - 10.3;
-            newGazCO = tupleCO.values[1] - 12.6;
+            newGazCH4 = tupleCH4.values[1] - puiss_vent;
+            newGazCO = tupleCO.values[1] - puiss_vent;
+            if(newGazCH4 < 0){
+                newGazCH4 = 0
+            }
+            if(newGazCO < 0){
+                newGazCO = 0
+            }
         }
 
         await Promise.all([
@@ -207,9 +234,9 @@ async function updateUI() {
 
 
 // Démarrage des intervalles
-setInterval(updateUI, 1000);
-setInterval(modifyLevels, 2000);
-setInterval(activeAgents, 1000);
-setInterval(readNiveauAgent, 1999);
+setInterval(updateUI, 500);
+setInterval(modifyLevels, 1000);
+setInterval(activeAgents, 500);
+setInterval(readNiveauAgent, 1000);
 
 

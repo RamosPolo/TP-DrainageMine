@@ -9,7 +9,7 @@ export class TupleSpace {
     // Ajoute un tuple à l'espace de tuples
     async out(tuple) {
         this.tuples.push(tuple);
-        await this._notifyWaiters(); // On attend que les agents soient bien réveillés
+        await this._notifyWaiters();
     }
 
     // Récupère et retire un tuple qui correspond au template (bloquant)
@@ -60,10 +60,9 @@ export class TupleSpace {
     
                 // Vérifier qu'il y a au moins 2 éléments (titre + valeur)
                 if (values.length > 1) {
-                    values[1] = newValue; // Modification de la valeur
+                    values[1] = newValue;
                 }
-    
-                return true; // Modification réussie
+                return true; 
             }
         }
         return false; // Aucun tuple correspondant trouvé
@@ -136,7 +135,7 @@ export class TupleSpace {
     async _notifyWaiters() {
         while (this.waitingQueue.length > 0 && this.tuples.length > 0) {
             const waiter = this.waitingQueue.shift();
-            setTimeout(() => waiter(), 0); // Exécuter sans bloquer
+            setTimeout(() => waiter(), 0); 
         }
     }    
     
